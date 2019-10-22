@@ -10,11 +10,12 @@ This repository contains the code to reproduce all results of the 2020 ICASSP pa
 
 ```
 @inproceedings{Duembgen2020,
-author={Duembgen Frederike and El Heloue Majed and Scholefield Adama}, 
-title={Realizability of planar point embeddings from angle measurements}, 
-booktitle={2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
-year=2020, 
-pages={pp. xxxx-xxxx}.
+  author={Duembgen Frederike and El Heloue Majed and Scholefield Adama}, 
+  title={Realizability of planar point embeddings from angle measurements}, 
+  booktitle={2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+  year={2020}, 
+  pages={xxxx--xxxx}
+}
 ```
 
 ## Authors
