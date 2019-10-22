@@ -1,10 +1,15 @@
 # Realizability of planar point embeddings
 
+*It is normal that the below Binder link is not working as long as the repository
+is not public yet. As soon as it is public, it should work.*
+
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/duembgen/AngleRealizability/master)
 
 This repository contains the code to reproduce all results of the 2020 ICASSP paper named
 
-REALIZABILITY OF PLANAR POINT EMBEDDINGS FROM ANGLE MEASUREMENTS. 
+```
+F.Duembgen, M. El Helou, A. Schoelefield., "Realizability of planar point embeddings from angle measurements", 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2020, pp. xxxx-xxxx.
+```
 
 ## Authors
 
