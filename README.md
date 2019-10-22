@@ -6,9 +6,15 @@ is not public yet. As soon as it is public, it should work.*
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/duembgen/AngleRealizability/master)
 
 This repository contains the code to reproduce all results of the 2020 ICASSP paper named
+*Realizability of planar point embeddings from angle measurements*.
 
 ```
-F.Duembgen, M. El Helou, A. Schoelefield., "Realizability of planar point embeddings from angle measurements", 2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP), 2020, pp. xxxx-xxxx.
+@inproceedings{Duembgen2020,
+author={Duembgen Frederike and El Heloue Majed and Scholefield Adama}, 
+title={Realizability of planar point embeddings from angle measurements}, 
+booktitle={2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
+year=2020, 
+pages={pp. xxxx-xxxx}.
 ```
 
 ## Authors
