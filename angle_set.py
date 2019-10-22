@@ -205,6 +205,30 @@ def get_ray_constraints(points, corners, theta, verbose=False):
     return A, b
 
 
+def get_numbers(N):
+    """ Generate number of lin. independent single and polygon constraints. """
+    sum_ = 0
+    for i in range(1, N-2): # goes to N-3
+        sum_ += i
+    n_rays = N * sum_
+    n_poly = int(binom(N-1, 2))
+    return n_rays, n_poly
+
+
+def get_linear_constraints(angle_set, full_rank=True):
+    """ Generate linear constraints. """
+    n_rays, n_poly = get_numbers(angle_set.N)
+    Apoly, bpoly = angle_set.get_polygon_constraints([3])
+    Aray, bray = angle_set.get_ray_constraints()
+    if full_rank:
+        Afull = np.vstack([Aray, Apoly[:n_poly]])
+        bfull = np.hstack([bray, bpoly[:n_poly]])
+    else:
+        Afull = np.vstack([Aray, Apoly])
+        bfull = np.hstack([bray, bpoly])
+    return Afull, bfull
+
+
 class AngleSet(PointSet):
     """ Class containing absolute/relative angles and linear constraints.
 

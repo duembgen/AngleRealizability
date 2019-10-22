@@ -34,6 +34,12 @@ def mse(a, b):
     return np.sum((a.flatten() - b.flatten())**2.0) / len(a.flatten())
 
 
+def get_noisy(vec, scale=0.1):
+    theta_noisy = vec.copy()
+    theta_noisy += np.random.normal(scale=scale, loc=0, size=theta_noisy.shape)
+    return theta_noisy
+
+
 def inner_loop(angle_set, verbose=False, learned=False):
     df = pd.DataFrame(columns=COLUMNS)
     df_counter = 0
@@ -49,8 +55,8 @@ def inner_loop(angle_set, verbose=False, learned=False):
         angle_set.N, n_sine_total))
 
     # create noisy angle vector
-    theta_noisy = angle_set.theta.copy()
-    theta_noisy += np.random.normal(scale=1e-3, loc=0, size=theta_noisy.shape)
+    
+    theta_noisy = get_noisy(angle_set.theta, scale, scale)
 
     # create linear constraints
     if not learned:
