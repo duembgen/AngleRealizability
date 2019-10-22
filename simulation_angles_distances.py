@@ -1,5 +1,8 @@
-#!/usr/bin/env python
-# coding: utf-8
+#! /usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+simulation_angles_distances.py: Create angle vs. distances recovery results.
+"""
 
 import matplotlib.pylab as plt
 import numpy as np
@@ -54,7 +57,7 @@ if __name__ == "__main__":
     sizes = range(1, 10)
     angle_set = AngleSet(N, d)
 
-    fname = 'results/intermediate.pkl'
+    fname = 'results/angles_distances.pkl'
 
     for size in sizes:
         print('size', size, '/', sizes)

@@ -1,7 +1,7 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-simulation.py: Simulate noisy angle reconstruction.
+simulation_discrepancy.py: Create discrepancy results.
 """
 
 import matplotlib.pylab as plt
