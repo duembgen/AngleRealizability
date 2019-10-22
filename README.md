@@ -21,6 +21,9 @@ All requirements are available through pip and can be installed using
 pip install -r requirements.txt
 ```
 
+## Use code
+
+An example of how to use the code base is given in Analysis.ipynb.
 
 ## Reproduce figures
 
