@@ -17,18 +17,35 @@ from angle_set import create_theta
 
 from angle_set import get_index
 
+def get_angles(x, corn, i):
+    """ Return the angles a, b, c, d, e, f
+    in a quadrilateral satisfying:
 
-def constraint_sine(x, c, i):
+    sin(c) * sin(b) * sin(f) =  sin(a) * sin(d) * sin(e)
+
+    :param x: theta vector (M,)
+    :param c: corners matrix (M, 3)
+    :param i: 4 indices to use for sine constraints.
+    """
+    a = x[get_index(corn, i[2], [i[0], i[1]])]
+    b = x[get_index(corn, i[2], [i[0], i[3]])]
+    c = x[get_index(corn, i[1], [i[0], i[2]])]
+    d = x[get_index(corn, i[3], [i[0], i[2]])]
+    e = x[get_index(corn, i[1], [i[0], i[3]])]
+    f = x[get_index(corn, i[3], [i[0], i[1]])]
+    return a, b, c, d, e, f
+
+
+def constraint_sine(x, corn, i):
     """
     :param x: theta vector (M,)
     :param c: corners matrix (M, 3)
     :param i: 4 indices to use for sine constraints.
     """
-    lhs = sin(x[get_index(c, i[1], [i[0], i[2]])]) * sin(x[get_index(
-        c, i[3], [i[0], i[1]])]) * sin(x[get_index(c, i[2], [i[0], i[3]])])
-    rhs = sin(x[get_index(c, i[2], [i[0], i[1]])]) * sin(x[get_index(
-        c, i[1], [i[0], i[3]])]) * sin(x[get_index(c, i[3], [i[0], i[2]])])
-    return abs(lhs - rhs)
+    a, b, c, d, e, f = get_angles(x, corn, i)
+    lhs = sin(c) * sin(b) * sin(f)
+    rhs = sin(a) * sin(d) * sin(e)
+    return lhs - rhs
 
 
 def constraint_sine_multi(x, c, N, choices=[]):
@@ -36,7 +53,7 @@ def constraint_sine_multi(x, c, N, choices=[]):
     :param x: theta vector (M,)
     :param c: corners matrix (M, 3)
     :param N: number of points
-    :param choices: list of constraints to add (will be added in order)
+    :param choices: list of constraints to add. The constraints are indexed from 0 to K-1, where K is the total number of available constraints. Per quadrilateral, we add one constraint. 
     """
     all_combinations = list(itertools.combinations(range(N), 4))
     # Also add one permutation per quadrilateral. This was once thought to be
