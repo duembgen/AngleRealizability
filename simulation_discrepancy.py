@@ -23,6 +23,7 @@ COLUMNS = [
     'n_linear', 'n_total', 'success'
 ]
 
+SCALE = 1e-3 # noise on angles
 
 def mae(a, b):
     assert len(a.flatten()) == len(b.flatten())
@@ -34,7 +35,7 @@ def mse(a, b):
     return np.sum((a.flatten() - b.flatten())**2.0) / len(a.flatten())
 
 
-def get_noisy(vec, scale=0.1):
+def get_noisy(vec, scale=SCALE):
     theta_noisy = vec.copy()
     theta_noisy += np.random.normal(scale=scale, loc=0, size=theta_noisy.shape)
     return theta_noisy
@@ -55,8 +56,7 @@ def inner_loop(angle_set, verbose=False, learned=False):
         angle_set.N, n_sine_total))
 
     # create noisy angle vector
-    
-    theta_noisy = get_noisy(angle_set.theta, scale, scale)
+    theta_noisy = get_noisy(angle_set.theta)
 
     # create linear constraints
     if not learned:
@@ -158,10 +158,10 @@ if __name__ == "__main__":
     from helpers import make_dirs_safe
 
     d = 2  # do not change.
-    Ns = np.arange(4, 9)  #20)
+    Ns = np.arange(4, 9)
     starti = 0
     endi = 20
-    learned = False
+    learned = True
 
     df = pd.DataFrame(columns=COLUMNS)
     if learned:

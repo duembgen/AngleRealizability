@@ -124,7 +124,7 @@ def solve_constrained_optimization(theta_noisy,
     # solve.
     options = {
         'disp': False,
-        'ftol': 1e-10,
+        'ftol': 1e-7,
         'maxiter': 400
     }  # ftol: stopping crit. for SLSQP method
     res = minimize(
