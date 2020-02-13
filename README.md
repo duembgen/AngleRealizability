@@ -1,8 +1,5 @@
 # Realizability of planar point embeddings
 
-*It is normal that the below Binder link is not working as long as the repository
-is not public yet. As soon as it is public, it should work.*
-
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/duembgen/AngleRealizability/master)
 
 This repository contains the code to reproduce all results of the 2020 ICASSP paper named
@@ -10,7 +7,7 @@ This repository contains the code to reproduce all results of the 2020 ICASSP pa
 
 ```
 @inproceedings{Duembgen2020,
-  author={Duembgen Frederike and El Heloue Majed and Scholefield Adama}, 
+  author={Dümbgen Frederike and El Helou Majed and Scholefield Adam}, 
   title={Realizability of planar point embeddings from angle measurements}, 
   booktitle={2020 IEEE International Conference on Acoustics, Speech and Signal Processing (ICASSP)},
   year={2020}, 
@@ -42,9 +39,9 @@ An example of how to use the code base is given in `Analysis.ipynb`.
 The Figures in the paper can be reproduced using the two below notebooks.
 
 - `Discrepancy.ipynb`: Figures 2 and 3. 
-- `Angles_vs_Distances`.ipynb: Figure 4.
+- `Angles_vs_Distances.ipynb`: Figure 4.
 
 These notebooks use pre-computed results.  To generate new results, you can run
 
-- `simulation_discrepancy.py`: apply increasing number of constraints for denoising (used for Figure 3). Generates new `results/discrepancy(_learned).pkl` file
-- `simulation_angles_distances.py`: angle vs. distance-based localization (used for Figure 4). Generates new `results/angles_distances.pkl` file.
+- `simulation_discrepancy.py`: apply increasing number of constraints for denoising (used for Figure 3). 
+- `simulation_angles_distances.py`: angle vs. distance-based localization (used for Figure 4). 
