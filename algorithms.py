@@ -124,7 +124,7 @@ def solve_constrained_optimization(theta_noisy,
     # solve.
     options = {
         'disp': False,
-        'ftol': 1e-7,
+        'ftol': 1e-10,
         'maxiter': 400
     }  # ftol: stopping crit. for SLSQP method
     res = minimize(
@@ -135,10 +135,6 @@ def solve_constrained_optimization(theta_noisy,
         constraints=cons,
         options=options)
     theta_hat = res.x
-    if not res.success:
-        # sometimes no success means there are some nans.
-        if np.any(np.isnan(theta_hat)):
-            theta_hat = theta_noisy
 
     # make sure theta is bettwen 0 and pi.
     if eps is None:

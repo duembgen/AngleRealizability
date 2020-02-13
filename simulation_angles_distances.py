@@ -15,8 +15,8 @@ from angle_set import AngleSet
 from algorithms import reconstruct_from_angles
 from algorithms import reconstruct_theta
 from algorithms import solve_constrained_optimization
-from simulation import generate_linear_constraints
-from simulation import mse
+from simulation_discrepancy import generate_linear_constraints
+from simulation_discrepancy import mse
 
 
 def add_edm_noise(edm, sigma=0.1):
@@ -45,16 +45,20 @@ if __name__ == "__main__":
     columns = ['sigma', 'SNR', 'error', 'type', 'N', 'n_it', 'size']
     df_results = pd.DataFrame(columns=columns)
 
-    df_counter = len(df_results)
+    df_counter = 0 
 
     N = 5
     d = 2
     eps = 1e-10
-    max_it = 10
+    max_it = 20
     num_sigma = 11
-    sigmas_angle = np.logspace(-3, 1, num_sigma)
-    sigmas_distance = [0.1, 1.0, 5.0]
-    sizes = range(1, 10)
+    #sigmas_angle = np.logspace(-3, 1, num_sigma)
+    #sigmas_distance = [0.1, 1.0, 5.0]
+    sigmas_angle = np.logspace(-5, 1, num_sigma)
+    sigmas_distance = np.logspace(-3, 1, 5)
+    sigmas_distance[-1] = 5
+    sigmas_distance *= 2
+    sizes = [1, 5, 10, 15, 20]
     angle_set = AngleSet(N, d)
 
     fname = 'results/angles_distances.pkl'
@@ -77,15 +81,17 @@ if __name__ == "__main__":
                 x_edm, *_ = procrustes(angle_set.points, x_edm)
                 error_edm = mse(x_edm, angle_set.points)
 
-                df_counter += 1
+                # effective noise is only sigma/2
+                # because of symmetry of EDM.
                 df_results.loc[df_counter, :] = dict(
-                    sigma=sigma / 2,
+                    sigma=sigma/2,
                     SNR=SNR_edm,
                     error=error_edm,
                     type='distance',
                     N=N,
                     n_it=i,
                     size=size)
+                df_counter += 1
 
             for k, sigma in enumerate(sigmas_angle):
                 print('angle', k, '/', len(sigmas_angle) - 1)
