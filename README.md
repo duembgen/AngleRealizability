@@ -32,16 +32,18 @@ pip install -r requirements.txt
 
 ## Use code
 
-An example of how to use the code base is given in `Analysis.ipynb`.
+This code base was developed for theoretical analysis and we do not guarantee efficiency or user-friendliness.
+However, if the reader is interested in further development, the best starting points for learning how to use the code are the notebooks. 
 
 ## Reproduce figures
 
 The Figures in the paper can be reproduced using the two below notebooks.
 
-- `Discrepancy.ipynb`: Figures 2 and 3. 
+- `Analysis.ipynb`: Figure 2. 
+- `Realizability.ipynb`: Figure 3. 
 - `Angles_vs_Distances.ipynb`: Figure 4.
 
-These notebooks use pre-computed results.  To generate new results, you can run
+Figures 3 and 4 use pre-computed results.  To generate new results, you can run
 
 - `simulation_discrepancy.py`: apply increasing number of constraints for denoising (used for Figure 3). 
 - `simulation_angles_distances.py`: angle vs. distance-based localization (used for Figure 4). 
