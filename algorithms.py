@@ -24,8 +24,8 @@ def get_angles(x, corn, i):
     sin(c) * sin(b) * sin(f) =  sin(a) * sin(d) * sin(e)
 
     :param x: theta vector (M,)
-    :param c: corners matrix (M, 3)
-    :param i: 4 indices to use for sine constraints.
+    :param corn: corners matrix (M, 3)
+    :param i: list of 4 indices to use for sine constraints.
     """
     a = x[get_index(corn, i[2], [i[0], i[1]])]
     b = x[get_index(corn, i[2], [i[0], i[3]])]
@@ -39,13 +39,13 @@ def get_angles(x, corn, i):
 def constraint_sine(x, corn, i):
     """
     :param x: theta vector (M,)
-    :param c: corners matrix (M, 3)
-    :param i: 4 indices to use for sine constraints.
+    :param corn: corners matrix (M, 3)
+    :param i: list of 4 indices to use for sine constraints.
     """
     a, b, c, d, e, f = get_angles(x, corn, i)
     lhs = sin(c) * sin(b) * sin(f)
     rhs = sin(a) * sin(d) * sin(e)
-    return lhs - rhs
+    return abs(lhs - rhs)
 
 
 def constraint_sine_multi(x, c, N, choices=[]):
@@ -53,7 +53,8 @@ def constraint_sine_multi(x, c, N, choices=[]):
     :param x: theta vector (M,)
     :param c: corners matrix (M, 3)
     :param N: number of points
-    :param choices: list of constraints to add. The constraints are indexed from 0 to K-1, where K is the total number of available constraints. Per quadrilateral, we add one constraint. 
+    :param choices: list of constraints to add. The constraints are indexed from 0 to K-1, where K is the total number of available constraints. 
+                     We add one constraint per quadrilateral. 
     """
     all_combinations = list(itertools.combinations(range(N), 4))
     # Also add one permutation per quadrilateral. This was once thought to be
