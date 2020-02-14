@@ -21,8 +21,7 @@ from simulation_discrepancy import mse
 
 def add_edm_noise(edm, sigma=0.1):
     distances = np.sqrt(edm[np.triu(edm) > 0])
-    noisy_distances = distances + np.random.normal(
-        scale=sigma, size=distances.shape)
+    noisy_distances = distances + np.random.normal(scale=sigma, size=distances.shape)
 
     noisy_edm = np.empty(edm.shape)
     np.fill_diagonal(noisy_edm, 0.0)
@@ -45,7 +44,7 @@ if __name__ == "__main__":
     columns = ['sigma', 'SNR', 'error', 'type', 'N', 'n_it', 'size']
     df_results = pd.DataFrame(columns=columns)
 
-    df_counter = 0 
+    df_counter = 0
 
     N = 5
     d = 2
@@ -83,35 +82,31 @@ if __name__ == "__main__":
 
                 # effective noise is only sigma/2
                 # because of symmetry of EDM.
-                df_results.loc[df_counter, :] = dict(
-                    sigma=sigma/2,
-                    SNR=SNR_edm,
-                    error=error_edm,
-                    type='distance',
-                    N=N,
-                    n_it=i,
-                    size=size)
+                df_results.loc[df_counter, :] = dict(sigma=sigma / 2,
+                                                     SNR=SNR_edm,
+                                                     error=error_edm,
+                                                     type='distance',
+                                                     N=N,
+                                                     n_it=i,
+                                                     size=size)
                 df_counter += 1
 
             for k, sigma in enumerate(sigmas_angle):
                 print('angle', k, '/', len(sigmas_angle) - 1)
-                noisy_theta, SNR_theta = add_theta_noise(
-                    angle_set.theta, sigma=sigma)
-                denoised_theta, success = solve_constrained_optimization(
-                    noisy_theta,
-                    angle_set.corners,
-                    N=angle_set.N,
-                    Afull=Afull,
-                    bfull=bfull,
-                    choices_sine=choices_sine,
-                    choices_linear=choices_linear,
-                    eps=None)
+                noisy_theta, SNR_theta = add_theta_noise(angle_set.theta, sigma=sigma)
+                denoised_theta, success = solve_constrained_optimization(noisy_theta,
+                                                                         angle_set.corners,
+                                                                         N=angle_set.N,
+                                                                         Afull=Afull,
+                                                                         bfull=bfull,
+                                                                         choices_sine=choices_sine,
+                                                                         choices_linear=choices_linear,
+                                                                         eps=None)
                 if any(denoised_theta == eps):
                     print('Found zero theta...')
                     continue
                 try:
-                    __, x_angle = reconstruct_theta(
-                        denoised_theta, angle_set.corners, angle_set.N)
+                    __, x_angle = reconstruct_theta(denoised_theta, angle_set.corners, angle_set.N)
                 except RuntimeError:
                     print('RuntimeError...')
                     continue
@@ -123,14 +118,13 @@ if __name__ == "__main__":
 
                 error_theta = mse(x_angle, angle_set.points)
 
-                df_results.loc[df_counter, :] = dict(
-                    sigma=sigma,
-                    SNR=SNR_theta,
-                    error=error_theta,
-                    type='angle',
-                    N=N,
-                    n_it=i,
-                    size=size)
+                df_results.loc[df_counter, :] = dict(sigma=sigma,
+                                                     SNR=SNR_theta,
+                                                     error=error_theta,
+                                                     type='angle',
+                                                     N=N,
+                                                     n_it=i,
+                                                     size=size)
                 df_counter += 1
 
             df_results.to_pickle(fname)

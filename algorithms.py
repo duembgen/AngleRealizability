@@ -7,15 +7,16 @@ algorithms.py: Functions to solve angle-based point recovery problems.
 import itertools
 from math import pi, sin, floor
 
-import numpy as np
 import matplotlib.pylab as plt
+import numpy as np
 from scipy.optimize import minimize
 
 from pylocus.basics_angles import get_inner_angle
 from pylocus.basics_angles import get_theta_tensor
-from angle_set import create_theta
 
+from angle_set import create_theta
 from angle_set import get_index
+
 
 def get_angles(x, corn, i):
     """ Return the angles a, b, c, d, e, f
@@ -64,20 +65,13 @@ def constraint_sine_multi(x, c, N, choices=[]):
     sum_ = 0
     for choice in choices:
         if choice >= len(all_combinations):
-            raise ValueError('higher choice than possible: {}'.format(
-                len(all_combinations)))
+            raise ValueError('higher choice than possible: {}'.format(len(all_combinations)))
         i = np.array(all_combinations[choice])
         sum_ += constraint_sine(x, c, i)
     return sum_ / len(choices)
 
 
-def solve_constrained_optimization(theta_noisy,
-                                   corners,
-                                   Afull,
-                                   bfull,
-                                   N,
-                                   choices_sine=[],
-                                   choices_linear=[],
+def solve_constrained_optimization(theta_noisy, corners, Afull, bfull, N, choices_sine=[], choices_linear=[],
                                    eps=1e-10):
     """ Solve angle denoising with linear and nonlinear constraints.
 
@@ -92,49 +86,27 @@ def solve_constrained_optimization(theta_noisy,
 
     :return: denoised angle vector, success boolean.
     """
-
     def loss(x):
         return 0.5 * np.linalg.norm(theta_noisy - x)**2
 
     if eps is not None:
-        bounds = np.c_[np.ones(theta_noisy.shape) * eps,
-                       np.ones(theta_noisy.shape) * pi - eps]
+        bounds = np.c_[np.ones(theta_noisy.shape) * eps, np.ones(theta_noisy.shape) * pi - eps]
     else:
-        bounds = np.c_[-np.ones(theta_noisy.shape) * pi,
-                       np.ones(theta_noisy.shape) * pi]
+        bounds = np.c_[-np.ones(theta_noisy.shape) * pi, np.ones(theta_noisy.shape) * pi]
     cons = []
 
     # choose linear constraints
     if len(choices_linear) > 0:
         Apart = Afull[choices_linear]
         bpart = bfull[choices_linear]
-        cons.append({
-            'type': 'eq',
-            'fun': lambda x: np.dot(Apart, x) - bpart,
-            'jac': lambda x: Apart
-        })
+        cons.append({'type': 'eq', 'fun': lambda x: np.dot(Apart, x) - bpart, 'jac': lambda x: Apart})
     # choose sine constraints
     if len(choices_sine) > 0:
-        cons.append({
-            'type':
-            'eq',
-            'fun':
-            lambda x: constraint_sine_multi(x, corners, N, choices_sine)
-        })
+        cons.append({'type': 'eq', 'fun': lambda x: constraint_sine_multi(x, corners, N, choices_sine)})
 
     # solve.
-    options = {
-        'disp': False,
-        'ftol': 1e-7,
-        'maxiter': 400
-    }  # ftol: stopping crit. for SLSQP method
-    res = minimize(
-        loss,
-        x0=theta_noisy,
-        bounds=bounds,
-        method='SLSQP',
-        constraints=cons,
-        options=options)
+    options = {'disp': False, 'ftol': 1e-7, 'maxiter': 400}  # ftol: stopping crit. for SLSQP method
+    res = minimize(loss, x0=theta_noisy, bounds=bounds, method='SLSQP', constraints=cons, options=options)
     theta_hat = res.x
 
     # make sure theta is bettwen 0 and pi.
@@ -167,8 +139,7 @@ def find_third_point(p0, p1, theta0, theta1, side=1):
         n0 = normal(alpha_02)
         n1 = normal(alpha_12)
 
-    A = np.r_[np.c_[n0, np.zeros((2, 1)), -np.eye(2)], np.c_[np.zeros(
-        (2, 1)), n1, -np.eye(2)]]
+    A = np.r_[np.c_[n0, np.zeros((2, 1)), -np.eye(2)], np.c_[np.zeros((2, 1)), n1, -np.eye(2)]]
     b = -np.r_[p0, p1]
     try:
         x = np.linalg.solve(A, b)

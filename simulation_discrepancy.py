@@ -18,12 +18,12 @@ from angle_set import create_theta
 from angle_set import get_index
 
 COLUMNS = [
-    'theta_sine', 'theta_sine_reconstructed', 'theta_noisy',
-    'theta_noisy_reconstructed', 'error_sine', 'error_noisy', 'n_it', 'n_sine',
-    'n_linear', 'n_total', 'success'
+    'theta_sine', 'theta_sine_reconstructed', 'theta_noisy', 'theta_noisy_reconstructed', 'error_sine', 'error_noisy',
+    'n_it', 'n_sine', 'n_linear', 'n_total', 'success'
 ]
 
-SCALE = 1e-3 # noise on angles
+SCALE = 1e-3  # noise on angles
+
 
 def mae(a, b):
     assert len(a.flatten()) == len(b.flatten())
@@ -50,10 +50,8 @@ def inner_loop(angle_set, verbose=False, learned=False):
     n_linear_total = n_rays + n_poly
     n_sine_total = angle_set.get_n_sine()
     necessary = angle_set.M - angle_set.get_DOF()
-    assert n_sine_total + n_linear_total == necessary, '{} {} {}'.format(
-        necessary, n_linear_total, n_sine_total)
-    print('number of sine constraints for N={}: {}'.format(
-        angle_set.N, n_sine_total))
+    assert n_sine_total + n_linear_total == necessary, '{} {} {}'.format(necessary, n_linear_total, n_sine_total)
+    print('number of sine constraints for N={}: {}'.format(angle_set.N, n_sine_total))
 
     # create noisy angle vector
     theta_noisy = get_noisy(angle_set.theta)
@@ -70,8 +68,7 @@ def inner_loop(angle_set, verbose=False, learned=False):
             raise RuntimeError('Did not learn enough linear constraints.')
 
     # reconstruct raw for baseline
-    theta_noisy_reconstructed, points_noisy = reconstruct_theta(
-        theta_noisy, angle_set.corners, angle_set.N)
+    theta_noisy_reconstructed, points_noisy = reconstruct_theta(theta_noisy, angle_set.corners, angle_set.N)
     error_noisy = mse(points_noisy, angle_set.points)
 
     # first linear then sine.
@@ -92,23 +89,20 @@ def inner_loop(angle_set, verbose=False, learned=False):
 
             choices_linear = range(n_linear)
             eps = 1e-10
-            theta_sine, success = solve_constrained_optimization(
-                theta_noisy,
-                angle_set.corners,
-                N=angle_set.N,
-                Afull=Afull,
-                bfull=bfull,
-                choices_sine=choices_sine,
-                choices_linear=choices_linear,
-                eps=eps)
+            theta_sine, success = solve_constrained_optimization(theta_noisy,
+                                                                 angle_set.corners,
+                                                                 N=angle_set.N,
+                                                                 Afull=Afull,
+                                                                 bfull=bfull,
+                                                                 choices_sine=choices_sine,
+                                                                 choices_linear=choices_linear,
+                                                                 eps=eps)
             if any(theta_sine == eps):
                 raise RuntimeError('Found zero angle.')
 
-            theta_sine_reconstructed, points_sine = reconstruct_theta(
-                theta_sine, angle_set.corners, angle_set.N)
+            theta_sine_reconstructed, points_sine = reconstruct_theta(theta_sine, angle_set.corners, angle_set.N)
 
-            points_sine, *_ = procrustes(
-                angle_set.points, points_sine, scale=True)
+            points_sine, *_ = procrustes(angle_set.points, points_sine, scale=True)
             error_sine = mse(points_sine, angle_set.points)
 
             df.loc[df_counter, :] = {
@@ -161,7 +155,7 @@ if __name__ == "__main__":
     Ns = np.arange(4, 9)
     starti = 0
     endi = 20
-    learned = True
+    learned = False
 
     df = pd.DataFrame(columns=COLUMNS)
     if learned:
@@ -186,9 +180,7 @@ if __name__ == "__main__":
                     success = True
                     break
             if not success:
-                print(
-                    'WARNING: skipping i={} cause did not find good configuration'
-                    .format(i))
+                print('WARNING: skipping i={} cause did not find good configuration'.format(i))
                 continue
 
             try:

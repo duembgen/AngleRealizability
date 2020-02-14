@@ -63,12 +63,10 @@ def create_theta(points):
         for _ in range(3):
             triangle = np.roll(triangle, 1)
             corners[k, :] = triangle
-            if np.allclose(
-                    points[triangle[1]], points[triangle[2]], atol=1e-10):
+            if np.allclose(points[triangle[1]], points[triangle[2]], atol=1e-10):
                 thetas[k] = 0.0
             else:
-                thetas[k] = get_inner_angle(points[triangle[0]],
-                                            points[tuple(triangle[1:]), :])
+                thetas[k] = get_inner_angle(points[triangle[0]], points[tuple(triangle[1:]), :])
             k += 1
         inner_angle_sum = thetas[k - 1] + thetas[k - 2] + thetas[k - 3]
         assert abs(inner_angle_sum - pi) < 1e-8, \
@@ -100,8 +98,7 @@ def combine_fullrank_matrix(A, A_add, b, b_add, print_out=False):
                 plt.matshow(A)
                 plt.title('lin indep. rows')
                 plt.matshow(np.vstack((A_add[i, :], A_add[i, :])))
-                plt.title('lin. dep. row: {}*{}'.format(
-                    indices, alpha[indices]))
+                plt.title('lin. dep. row: {}*{}'.format(indices, alpha[indices]))
     if (print_out):
         print('added {} linearly independent rows.'.format(counter))
     return A, b
@@ -153,23 +150,15 @@ def get_ray_constraints(points, corners, theta, verbose=False):
                 print('number', num)
             for start in range(N - 1 - num):
                 if verbose:
-                    print('from', ordered_indices[start], 'to',
-                          ordered_indices[start + num])
+                    print('from', ordered_indices[start], 'to', ordered_indices[start + num])
 
                 # first use outer angle
-                indices = [
-                    get_index(
-                        corners, corner,
-                        (ordered_indices[start], ordered_indices[start + num]))
-                ]
+                indices = [get_index(corners, corner, (ordered_indices[start], ordered_indices[start + num]))]
                 angles = [theta[indices[-1]]]
 
                 # then use all inner angles.
                 for j in range(start, start + num):
-                    indices.append(
-                        get_index(
-                            corners, corner,
-                            (ordered_indices[j], ordered_indices[j + 1])))
+                    indices.append(get_index(corners, corner, (ordered_indices[j], ordered_indices[j + 1])))
                     angles.append(theta[indices[-1]])
 
                 max_idx = np.argmax(angles)
@@ -208,10 +197,10 @@ def get_ray_constraints(points, corners, theta, verbose=False):
 def get_numbers(N):
     """ Generate number of lin. independent single and polygon constraints. """
     sum_ = 0
-    for i in range(1, N-2): # goes to N-3
+    for i in range(1, N - 2):  # goes to N-3
         sum_ += i
     n_rays = N * sum_
-    n_poly = int(binom(N-1, 2))
+    n_poly = int(binom(N - 1, 2))
     return n_rays, n_poly
 
 
@@ -240,7 +229,6 @@ class AngleSet(PointSet):
     :param self.A: Matrix of constraints (self.C x self.M)
     :param self.b: Vector of constraints (self.C x 1)
     """
-
     def __init__(self, N, d):
         from scipy import special
         PointSet.__init__(self, N, d)
@@ -270,8 +258,7 @@ class AngleSet(PointSet):
         rows, cols = np.indices((self.N, self.N))
         pi_pj_x = (self.points[rows, 0] - self.points[cols, 0])
         pi_pj_y = (self.points[rows, 1] - self.points[cols, 1])
-        D = np.sqrt(
-            np.sum((self.points[rows, :] - self.points[cols, :])**2, axis=2))
+        D = np.sqrt(np.sum((self.points[rows, :] - self.points[cols, :])**2, axis=2))
         cosine = np.ones([self.N, self.N])
         sine = np.zeros([self.N, self.N])
         cosine[D > 0] = pi_pj_x[D > 0] / D[D > 0]
@@ -288,9 +275,7 @@ class AngleSet(PointSet):
         self.abs_angles = Dc
 
     def get_inner_angle(self, corner, other):
-        return get_inner_angle(
-            self.points[corner, :],
-            (self.points[other[0], :], self.points[other[1], :]))
+        return get_inner_angle(self.points[corner, :], (self.points[other[0], :], self.points[other[1], :]))
 
     def get_theta(self, i, j, k):
         return self.theta_tensor[i, j, k]
@@ -314,8 +299,7 @@ class AngleSet(PointSet):
         theta_ik = truth.abs_angles[i, k]
         diff = from_0_to_2pi(theta_ik - theta_ij)
         test2 = (diff > 0 and diff < pi)
-        assert (test == test2), "diff: %r, scalar prodcut: %r" % (
-            diff, np.dot(own.points[k, :] - own.points[i, :], w))
+        assert (test == test2), "diff: %r, scalar prodcut: %r" % (diff, np.dot(own.points[k, :] - own.points[i, :], w))
 
         thetai_jk = truth.get_theta(i, j, k)
         thetaj_ik = truth.get_theta(j, i, k)
@@ -387,13 +371,11 @@ class AngleSet(PointSet):
                         sum_theta = 0
                         # sum over all inner angles.
                         for k in range(m):
-                            sum_theta += self.get_inner_angle(
-                                p[1], (p[0], p[2]))
+                            sum_theta += self.get_inner_angle(p[1], (p[0], p[2]))
                             p = np.roll(p, 1)
                         angle = sum_theta
                         sum_angle = (m - 2) * pi
-                        if (abs(angle - sum_angle) < 1e-14
-                                or abs(angle) < 1e-14):
+                        if (abs(angle - sum_angle) < 1e-14 or abs(angle) < 1e-14):
                             if (print_out):
                                 print("convex polygon found:    ", p)
                             convex_polygons.append(p.copy())
@@ -404,9 +386,7 @@ class AngleSet(PointSet):
                                 print("oops")
         return convex_polygons
 
-    def get_polygon_constraints(self,
-                                range_polygones=range(3, 5),
-                                print_out=False):
+    def get_polygon_constraints(self, range_polygones=range(3, 5), print_out=False):
         """ Create all convex polygone constraints.
 
         :param range_polygones: list of numbers of polygones to test.
@@ -435,8 +415,7 @@ class AngleSet(PointSet):
             triangle = [corner, *pair]
             for _ in range(3):
                 triangle = np.roll(triangle, 1)
-                idx = get_index(self.corners, triangle[0],
-                                (triangle[1], triangle[2]))
+                idx = get_index(self.corners, triangle[0], (triangle[1], triangle[2]))
                 row[idx] = 1.0
             rows_A.append(row)
         A = np.vstack(rows_A)
@@ -469,8 +448,7 @@ class AngleSet(PointSet):
         return indices_rays, indices_triangles, np_corners_rays, np_angles_rays
 
     def get_ray_constraints(self, verbose=False):
-        return get_ray_constraints(
-            self.points, self.corners, self.theta, verbose=verbose)
+        return get_ray_constraints(self.points, self.corners, self.theta, verbose=verbose)
 
     def get_angle_constraints_m(self, polygons_m, print_out=False):
         rows = []
@@ -495,25 +473,21 @@ class AngleSet(PointSet):
                     sum_angles = 0
                     # inner angles
                     for l in range(i, i + k):
-                        sum_angles += self.get_inner_angle(
-                            p[0], (p[l], p[l + 1]))
+                        sum_angles += self.get_inner_angle(p[0], (p[l], p[l + 1]))
                         index = get_index(self.corners, p[0], (p[l], p[l + 1]))
                         if (print_out):
-                            print('+ {} (= index{}: {})'.format(
-                                (p[0], (p[l], p[l + 1])), np.where(index),
-                                self.corners[index, :]))
+                            print('+ {} (= index{}: {})'.format((p[0], (p[l], p[l + 1])), np.where(index),
+                                                                self.corners[index, :]))
                         row[index] = 1
                     index = get_index(self.corners, p[0], (p[i], p[i + k]))
                     if (print_out):
-                        print(' = {} (= index{}: {})'.format(
-                            (p[0], (p[i], p[i + k])), np.where(index),
-                            self.corners[index, :]))
+                        print(' = {} (= index{}: {})'.format((p[0], (p[i], p[i + k])), np.where(index),
+                                                             self.corners[index, :]))
                     row[index] = -1
                     rows.append(row)
                     if (print_out):
-                        print('sum_angles - expected:{}'.format(
-                            sum_angles -
-                            self.get_inner_angle(p[0], (p[i], p[i + k]))))
+                        print('sum_angles - expected:{}'.format(sum_angles -
+                                                                self.get_inner_angle(p[0], (p[i], p[i + k]))))
                     if np.sum(np.nonzero(A)) == 0:
                         A = row
                     else:
@@ -552,8 +526,7 @@ class AngleSet(PointSet):
         if (print_out):
             print('shape of A {}'.format(A.shape))
         if (print_out):
-            print('chosen angles m={}:\n{}'.format(
-                m, (corners_tiled)[A_repeat].reshape((-1, m * 3))))
+            print('chosen angles m={}:\n{}'.format(m, (corners_tiled)[A_repeat].reshape((-1, m * 3))))
         if (print_out):
             print('{}-polygones: {}'.format(m, rows_A))
         self.A = A
