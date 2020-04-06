@@ -49,7 +49,7 @@ def inner_loop(angle_set, verbose=False, learned=False):
     n_poly = angle_set.get_n_poly()
     n_linear_total = n_rays + n_poly
     n_sine_total = angle_set.get_n_sine()
-    necessary = angle_set.M - angle_set.get_DOF()
+    necessary = angle_set.num_angles - angle_set.get_DOF()
     assert n_sine_total + n_linear_total == necessary, '{} {} {}'.format(necessary, n_linear_total, n_sine_total)
     print('number of sine constraints for N={}: {}'.format(angle_set.N, n_sine_total))
 
@@ -149,13 +149,23 @@ def generate_linear_constraints(points, verbose=False):
 
 
 if __name__ == "__main__":
-    from helpers import make_dirs_safe
+    import argparse
 
+    parser = argparse.ArgumentParser(description='Run discrepancy tests.') 
+    parser.add_argument('--Ns', metavar='Ns', type=int, nargs='+', default=range(4, 9),
+                        help='number of points N')
+    parser.add_argument('--learned', dest='learned', action='store_true',
+                        help='use automatic constraints generation')
+    parser.add_argument('--num_it', metavar='num_it', type=int, default=20, 
+                        help='number of iterations')
+    args = parser.parse_args()
+
+    from helpers import make_dirs_safe
+    
     d = 2  # do not change.
-    Ns = np.arange(4, 9)
-    starti = 0
-    endi = 20
-    learned = False
+    Ns = args.Ns
+    num_it = args.num_it
+    learned = args.learned
 
     df = pd.DataFrame(columns=COLUMNS)
     if learned:
@@ -168,8 +178,8 @@ if __name__ == "__main__":
     for N in Ns:
         print('N', N, Ns)
         angle_set = AngleSet(N=N, d=d)
-        for i in range(starti, endi):
-            print('i={}/{}'.format(i, endi))
+        for i in range(num_it):
+            print('i={}/{}'.format(i, num_it))
             np.random.seed(i)
 
             # make sure this angle set has no (almost) zero angles.

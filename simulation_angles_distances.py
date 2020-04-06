@@ -6,6 +6,7 @@ simulation_angles_distances.py: Create angle vs. distances recovery results.
 
 import matplotlib.pylab as plt
 import numpy as np
+import pandas as pd
 
 from pylocus.algorithms import procrustes
 from pylocus.algorithms import reconstruct_mds
@@ -40,16 +41,21 @@ def add_theta_noise(theta, sigma=0.1):
 
 
 if __name__ == "__main__":
-    import pandas as pd
-    columns = ['sigma', 'SNR', 'error', 'type', 'N', 'n_it', 'size']
-    df_results = pd.DataFrame(columns=columns)
+    import argparse
 
-    df_counter = 0
+    parser = argparse.ArgumentParser(description='Run discrepancy tests.') 
+    parser.add_argument('--sizes', metavar='Ns', type=int, nargs='+', default=[1, 5, 10, 15, 20],
+                        help='square sizes')
+    parser.add_argument('--num_it', metavar='num_it', type=int, default=20, 
+                        help='number of iterations')
+    args = parser.parse_args()
+
+    num_it = args.num_it
+    sizes = args.sizes
 
     N = 5
     d = 2
     eps = 1e-10
-    max_it = 20
     num_sigma = 11
     #sigmas_angle = np.logspace(-3, 1, num_sigma)
     #sigmas_distance = [0.1, 1.0, 5.0]
@@ -57,15 +63,18 @@ if __name__ == "__main__":
     sigmas_distance = np.logspace(-3, 1, 5)
     sigmas_distance[-1] = 5
     sigmas_distance *= 2
-    sizes = [1, 5, 10, 15, 20]
-    angle_set = AngleSet(N, d)
 
     fname = 'results/angles_distances.pkl'
 
+    angle_set = AngleSet(N, d)
+    columns = ['sigma', 'SNR', 'error', 'type', 'N', 'n_it', 'size']
+    df_results = pd.DataFrame(columns=columns)
+    df_counter = 0
+
     for size in sizes:
         print('size', size, '/', sizes)
-        for i in range(max_it):
-            print('n_it', i, '/', max_it - 1)
+        for i in range(num_it):
+            print('n_it', i, '/', num_it - 1)
             np.random.seed(i)
             angle_set.set_points('random', size=size)
             Afull, bfull = generate_linear_constraints(angle_set.points)
