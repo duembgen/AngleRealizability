@@ -151,17 +151,14 @@ def generate_linear_constraints(points, verbose=False):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Run discrepancy tests.') 
-    parser.add_argument('--Ns', metavar='Ns', type=int, nargs='+', default=range(4, 9),
-                        help='number of points N')
-    parser.add_argument('--learned', dest='learned', action='store_true',
-                        help='use automatic constraints generation')
-    parser.add_argument('--num_it', metavar='num_it', type=int, default=20, 
-                        help='number of iterations')
+    parser = argparse.ArgumentParser(description='Run discrepancy tests.')
+    parser.add_argument('--Ns', metavar='Ns', type=int, nargs='+', default=range(4, 9), help='number of points N')
+    parser.add_argument('--learned', dest='learned', action='store_true', help='use automatic constraints generation')
+    parser.add_argument('--num_it', metavar='num_it', type=int, default=20, help='number of iterations')
     args = parser.parse_args()
 
     from helpers import make_dirs_safe
-    
+
     d = 2  # do not change.
     Ns = args.Ns
     num_it = args.num_it

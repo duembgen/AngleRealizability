@@ -207,7 +207,9 @@ class AngleSet(PointSet):
         num_triangles = self.N * (self.N - 1) * (self.N - 2) / 6
 
         self.num_angles = int(3 * num_triangles)
-        self.theta = np.empty([self.num_angles, ])
+        self.theta = np.empty([
+            self.num_angles,
+        ])
         self.theta_tensor = np.empty([N, N, N])
         self.corners = np.empty([self.num_angles, 3])
 
@@ -217,9 +219,7 @@ class AngleSet(PointSet):
         self.theta_tensor = get_theta_tensor(self.theta, self.corners, self.N)
 
     def get_inner_angle(self, corner, other):
-        return get_inner_angle(self.points[corner, :], 
-                               (self.points[other[0], :], 
-                                self.points[other[1], :]))
+        return get_inner_angle(self.points[corner, :], (self.points[other[0], :], self.points[other[1], :]))
 
     def get_theta(self, i, j, k):
         return self.theta_tensor[i, j, k]
@@ -340,8 +340,8 @@ class AngleSet(PointSet):
 
     def get_linear_constraints(self, full_rank=True):
         """ Generate linear constraints. """
-        n_rays = self.get_n_rays() 
-        n_poly = self.get_n_poly() 
+        n_rays = self.get_n_rays()
+        n_poly = self.get_n_poly()
         Apoly, bpoly = self.get_polygon_constraints([3])
         Aray, bray = self.get_ray_constraints()
         if full_rank:

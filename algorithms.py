@@ -71,7 +71,13 @@ def constraint_sine_multi(x, c, N, choices=[]):
     return sum_ / len(choices)
 
 
-def solve_constrained_optimization(theta_noisy, corners, Afull, bfull, N, choices_sine=[], choices_linear=[],
+def solve_constrained_optimization(theta_noisy,
+                                   corners,
+                                   Afull,
+                                   bfull,
+                                   N,
+                                   choices_sine=[],
+                                   choices_linear=[],
                                    eps=1e-10):
     """ Solve angle denoising with linear and nonlinear constraints.
 

@@ -47,3 +47,14 @@ Figures 3 and 4 use pre-computed results.  To generate new results, you can run
 
 - `simulation_discrepancy.py`: apply increasing number of constraints for denoising (used for Figure 3). 
 - `simulation_angles_distances.py`: angle vs. distance-based localization (used for Figure 4). 
+
+To make your life easier, you can generate all results from the paper in one line by running 
+
+``` 
+./generate_results.sh
+```
+
+or, if you just want to have a quick set of results, run
+```
+./generate_results_quick.sh
+```

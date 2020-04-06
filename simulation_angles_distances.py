@@ -43,11 +43,9 @@ def add_theta_noise(theta, sigma=0.1):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description='Run discrepancy tests.') 
-    parser.add_argument('--sizes', metavar='Ns', type=int, nargs='+', default=[1, 5, 10, 15, 20],
-                        help='square sizes')
-    parser.add_argument('--num_it', metavar='num_it', type=int, default=20, 
-                        help='number of iterations')
+    parser = argparse.ArgumentParser(description='Run discrepancy tests.')
+    parser.add_argument('--sizes', metavar='Ns', type=int, nargs='+', default=[1, 5, 10, 15, 20], help='square sizes')
+    parser.add_argument('--num_it', metavar='num_it', type=int, default=20, help='number of iterations')
     args = parser.parse_args()
 
     num_it = args.num_it
