@@ -185,8 +185,9 @@ def get_ray_constraints(points, corners, theta, verbose=False):
                 As.append(newline.tolist())
                 bs.append(b)
 
-    A = np.array(As)
-    b = np.array(bs)
+    # below also works with we found 0 ray constraints (for triangle, for instance)
+    A = np.array(As).reshape((-1, len(theta)))
+    b = np.array(bs).reshape((A.shape[0],))
     return A, b
 
 
