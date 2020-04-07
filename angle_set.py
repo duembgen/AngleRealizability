@@ -13,7 +13,6 @@ from scipy.special import binom
 
 from pylocus.point_set import PointSet
 from pylocus.basics_angles import get_inner_angle
-from pylocus.basics_angles import get_index
 from pylocus.basics_angles import get_theta_tensor
 from pylocus.basics_angles import from_0_to_2pi
 
@@ -104,7 +103,7 @@ def get_index(corners, i, jk):
     """ Find the index that angle with corners
     i, jk has inside the corners set.
     """
-    if type(jk) == tuple:
+    if type(jk) != list:
         jk = list(jk)
     assert corners.shape[1] == 3
     sol = np.where(np.bitwise_or(np.all(corners == [i] + jk, axis=1), 
@@ -162,7 +161,7 @@ def define_ray_constraints(corner, corners, theta, ordered_indices):
     num_rays = len(ordered_indices)
     As = []; bs = []
     for num in range(2, num_rays+1): # number of rays involved
-        for i in range(num_rays - num - 1):
+        for i in range(num_rays - num):
             start_idx  = ordered_indices[i]
             end_idx = ordered_indices[i+num]
 
