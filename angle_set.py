@@ -107,25 +107,111 @@ def get_index(corners, i, jk):
     if type(jk) == tuple:
         jk = list(jk)
     assert corners.shape[1] == 3
-    sol1 = list(np.where(np.all(corners == [i] + jk, axis=1))[0])
-    sol2 = list(np.where(np.all(corners == [i] + jk[::-1], axis=1))[0])
-    sol = sol1 + sol2
-    if len(sol) == 0:
+    sol = np.where(np.bitwise_or(np.all(corners == [i] + jk, axis=1), 
+                                 np.all(corners == [i] + jk[::-1], axis=1)))[0]
+    if len(sol) > 0: 
+        return sol[0]
+    else:
         print('did not find anything for', corners, i, jk)
-    assert len(sol) == 1
-    return sol[0]
+
+
+def get_absolute_angles(points, num_ambiguities=0):
+    """ 
+    Get absolute angle from each point to each other point.
+    """
+    # create empty measurement structure
+    N = points.shape[0]
+    absolute_angles = {
+        corner: {
+            other_corner: [] for other_corner in range(N) if other_corner != corner
+        } for corner in range(N) 
+    }
+
+    for corner in absolute_angles.keys():
+        x0 = points[corner]
+
+        # determine absolute angles
+        for other_idx in absolute_angles[corner].keys():
+            xi = points[other_idx]
+            vec = xi - x0
+            abs_rad = np.arctan2(vec[1], vec[0])
+            # first element is ground truth.
+            absolute_angles[corner][other_idx].append(from_0_to_2pi(abs_rad))
+            # add some "wrong" angles.
+            for _ in range(num_ambiguities):
+                random_angle = np.random.uniform(0, 2*np.pi)
+                absolute_angles[corner][other_idx].append(random_angle)
+    return absolute_angles
+
+
+def define_ray_constraints(corner, corners, theta, ordered_indices):
+    """ Find the corrent ray constraints, given an order of incoming rays.
+
+    :param corner: current corner to investigate.
+    :param corners: list of corners indices.
+    :param theta: list of inner angles.
+    :param ordered_indices: list of ordered indices. For example [2, 1, 3] if 
+                            ot corner 0, the incoming rays are in order 2, 1, 3.
+
+    :return: list of lines of linear constraint matrix A, list of new components of b.
+    """
+
+    
+
+    eps = 1e-13
+    num_rays = len(ordered_indices)
+    As = []; bs = []
+    for num in range(2, num_rays+1): # number of rays involved
+        for i in range(num_rays - num - 1):
+            start_idx  = ordered_indices[i]
+            end_idx = ordered_indices[i+num]
+
+            # find outer angle
+            indices = [get_index(corners, corner, (start_idx, end_idx))]
+            theta_active = [theta[indices[-1]]] # outer angle
+
+            # then use all inner angles.
+            for j in range(i, i + num):
+                indices.append(get_index(corners, corner, (ordered_indices[j], ordered_indices[j + 1])))
+                theta_active.append(theta[indices[-1]]) # inner angles
+
+            # find out the biggest angle
+            max_idx = np.argmax(theta_active)
+            max_angle = np.max(theta_active)
+            theta_active.pop(max_idx)
+            actual_max_idx = indices.pop(max_idx)
+
+            # figure out what kind of constraint we have.
+            newline = np.zeros((len(corners)))
+            sum_ = sum(theta_active)
+            if sum_ > np.pi:
+                if abs(2 * np.pi - sum_ - max_angle) > eps:
+                    print('FAILED 2pi', 2 * np.pi - sum_, max_angle)
+                else:
+                    # using angle could lead to precision errors
+                    # but is less complicated than indexing.
+                    newline[indices] = 1.0
+                    newline[actual_max_idx] = 1.0
+                    b = 2 * np.pi
+            else:
+                if abs(sum_ - max_angle) > eps:
+                    print('FAILED sum', sum_, max_angle)
+                else:
+                    newline[indices] = 1.0
+                    newline[actual_max_idx] = -1.0
+                    b = 0
+            As.append(newline.tolist())
+            bs.append(b)
+    return As, bs
 
 
 def get_ray_constraints(points, corners, theta, verbose=False):
-    eps = 1e-13
     N = points.shape[0]
 
     As = []
     bs = []
-
+    
     for corner in range(N):
-        if verbose:
-            print('corner', corner)
         x0 = points[corner]
         indices = list(range(N))
         indices.pop(corner)
@@ -136,54 +222,13 @@ def get_ray_constraints(points, corners, theta, verbose=False):
             vec = xi - x0
             abs_rad = np.arctan2(vec[1], vec[0])
             absolute_angles.append(from_0_to_2pi(abs_rad) * 180 / np.pi)
+
         order = np.argsort(absolute_angles).tolist()
         ordered_indices = [indices[o] for o in order] + [indices[order[0]]]
-        if verbose:
-            print(ordered_indices)
 
-        for num in range(2, N):
-            if verbose:
-                print('number', num)
-            for start in range(N - 1 - num):
-                if verbose:
-                    print('from', ordered_indices[start], 'to', ordered_indices[start + num])
-
-                # first use outer angle
-                indices = [get_index(corners, corner, (ordered_indices[start], ordered_indices[start + num]))]
-                angles = [theta[indices[-1]]]
-
-                # then use all inner angles.
-                for j in range(start, start + num):
-                    indices.append(get_index(corners, corner, (ordered_indices[j], ordered_indices[j + 1])))
-                    angles.append(theta[indices[-1]])
-
-                max_idx = np.argmax(angles)
-                max_angle = np.max(angles)
-                angles.pop(max_idx)
-                actual_max_idx = indices.pop(max_idx)
-
-                newline = np.zeros((len(theta)))
-
-                sum_ = sum(angles)
-                if sum_ > np.pi:
-                    if abs(2 * np.pi - sum_ - max_angle) > eps:
-                        print('FAILED 2pi', 2 * np.pi - sum_, max_angle)
-                    else:
-                        # using angle could lead to precision errors
-                        # but is less complicated than indexing.
-                        newline[indices] = 1.0
-                        newline[actual_max_idx] = 1.0
-                        b = 2 * np.pi
-                else:
-                    if abs(sum_ - max_angle) > eps:
-                        print('FAILED sum', sum_, max_angle)
-                    else:
-                        newline[indices] = 1.0
-                        newline[actual_max_idx] = -1.0
-                        b = 0
-
-                As.append(newline.tolist())
-                bs.append(b)
+        As_corner, bs_corner = define_ray_constraints(corner, corners, theta, ordered_indices)
+        As += As_corner
+        bs += bs_corner
 
     # below also works with we found 0 ray constraints (for triangle, for instance)
     A = np.array(As).reshape((-1, len(theta)))
