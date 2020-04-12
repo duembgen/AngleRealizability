@@ -134,12 +134,12 @@ def get_absolute_angles(points, num_ambiguities=0):
             xi = points[other_idx]
             vec = xi - x0
             abs_rad = np.arctan2(vec[1], vec[0])
-            # first element is ground truth.
-            absolute_angles[corner][other_idx].append(from_0_to_2pi(abs_rad))
             # add some "wrong" angles.
             for _ in range(num_ambiguities):
                 random_angle = np.random.uniform(0, 2*np.pi)
                 absolute_angles[corner][other_idx].append(random_angle)
+            # last element is ground truth.
+            absolute_angles[corner][other_idx].append(from_0_to_2pi(abs_rad))
     return absolute_angles
 
 
