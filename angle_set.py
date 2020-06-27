@@ -110,8 +110,6 @@ def get_index(corners, i, jk):
                                  np.all(corners == [i] + jk[::-1], axis=1)))[0]
     if len(sol) > 0: 
         return sol[0]
-    else:
-        print('did not find anything for', corners, i, jk)
 
 
 def get_absolute_angles(points, num_ambiguities=0):
